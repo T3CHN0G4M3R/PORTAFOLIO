@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio - Carlos Osorno (T3CHNO_NYX)</title>
+    
+    <!-- Fuentes futuristas Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:ital,wght@0,500;0,700;1,900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Paleta: Negro, Blanco y Rojo Crimson Neon */
+            --bg-dark: #050508;
+            --card-bg: rgba(14, 14, 18, 0.75);
+            --card-inner: rgba(22, 22, 28, 0.85);
+            --red-neon: #ff003c;
+            --red-glow: rgba(255, 0, 60, 0.45);
+            --red-bright: #ff335c;
+            --text-main: #f0f0f5;
+            --text-muted: #8a8a9a;
+            --border-cyber: #2a2a38;
+            --header-extra-height: 0px;
+            --red-line-thickness: 3px;
+            /* Cyberpunk Cut-out shapes */
+            --clip-chamfer: polygon(0 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px));
+            --clip-chamfer-reverse: polygon(25px 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%, 0 25px);
+        }
+
+        * {
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            font-size: 1.1rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas de fondo estrellas y partículas rojas/blancas */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* HEADER ULTRA COMPACTO Y DINÁMICO */
+        header {
+            background: linear-gradient(180deg, rgba(5, 5, 8, 0.98) 0%, rgba(14, 14, 18, 0.95) 100%);
+            backdrop-filter: blur(15px);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            user-select: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid rgba(255, 0, 60, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 2vw;
+            min-height: 50px;
+        }
+
+        .brand-nickname {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px var(--red-neon), 0 0 15px var(--red-glow);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-nickname::before {
+            content: 'sys.01';
+            font-size: 0.6rem;
+            color: var(--red-neon);
+            vertical-align: super;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            padding: 6px 16px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            background: rgba(255, 0, 60, 0.15);
+            color: #ffffff;
+            box-shadow: inset 0 0 10px var(--red-glow);
+            border: 1px solid var(--red-neon);
+            text-shadow: 0 0 8px #ffffff;
+        }
+
+        .expandable-content {
+            height: var(--header-extra-height);
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: calc(var(--header-extra-height) / 300);
+            transition: opacity 0.2s ease, height 0.3s ease;
+            pointer-events: auto;
+            width: 100%;
+        }
+
+        .expandable-inner {
+            width: 100%;
+            max-width: 1500px;
+            padding: 2rem 4vw;
+            display: grid;
+            grid-template-columns: auto 1.2fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .header-profile-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        /* Envoltura para el borde de neón de la imagen */
+        .profile-img-wrapper {
+            position: relative;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--red-neon) 0%, rgba(255,0,60,0.1) 50%, var(--red-neon) 100%);
+            clip-path: polygon(25px 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%, 0 25px);
+            box-shadow: 0 0 20px var(--red-glow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile-avatar {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
+            display: block;
+        }
+
+        .profile-img-wrapper:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px var(--red-neon);
+        }
+
+        .header-bio-title {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-bio-title h1 {
+            margin: 0 0 10px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            color: #ffffff;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+            line-height: 1;
+        }
+
+        .header-bio-title .subtitle {
+            margin-top: 5px;
+            font-size: 1.1rem;
+            color: var(--red-bright);
+            font-weight: 700;
+            letter-spacing: 3px;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px var(--red-glow);
+            text-transform: uppercase;
+            display: block;
+            border-bottom: 1px solid var(--red-neon);
+            padding-bottom: 15px;
+            width: 100%;
+        }
+
+        .about-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            clip-path: var(--clip-chamfer-reverse);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--red-neon);
+        }
+
+        .about-card:hover {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--red-neon);
+            box-shadow: inset 0 0 20px var(--red-glow);
+        }
+
+        .about-card-title {
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .about-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .header-bio-text {
+            background: rgba(22, 22, 28, 0.5);
+            border-left: 4px solid var(--red-neon);
+            padding: 2rem;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .header-bio-text p {
+            margin: 0 0 15px 0;
+            color: #d0d0e0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .header-bio-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .header-bio-text strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .resizer-line {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: var(--red-line-thickness);
+            background: var(--red-neon);
+            box-shadow: 0 0 15px var(--red-neon), 0 0 30px var(--red-glow);
+            cursor: ns-resize;
+            transition: background 0.2s, height 0.2s;
+            z-index: 101;
+        }
+
+        .resizer-line::after {
+            content: '▼ ARRASTRAR PARA INFO ▼';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            background: var(--bg-dark);
+            padding: 4px 20px;
+            border: 1px solid var(--red-neon);
+            box-shadow: 0 0 10px var(--red-neon);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .resizer-line:hover, .resizer-line.dragging {
+            height: 6px;
+            background: var(--red-bright);
+        }
+
+        main {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 4rem 2vw;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        section {
+            width: 100%;
+            position: relative;
+        }
+
+        .cyber-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .cyber-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-style: italic;
+            font-size: 2rem;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .cyber-header .hud-line {
+            flex-grow: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--red-neon) 0%, transparent 100%);
+            position: relative;
+        }
+
+        .cyber-header .hud-line::before {
+            content: '[SYS_ACTV]';
+            position: absolute;
+            right: 0;
+            top: -10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: var(--red-neon);
+            letter-spacing: 2px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border-cyber);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        .tab-btn.active {
+            background: var(--red-neon);
+            color: #ffffff;
+            border-color: var(--red-neon);
+            box-shadow: 0 0 15px var(--red-glow);
+        }
+
+        .projects-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-cyber);
+            clip-path: var(--clip-chamfer);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            height: 100%;
+            min-height: 380px;
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 30px; height: 30px;
+            background: var(--red-neon);
+            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--red-neon);
+            background: rgba(22, 22, 28, 0.9);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .project-card:hover::after {
+            opacity: 1;
+        }
+
+        .project-card.featured {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background: linear-gradient(135deg, rgba(20,20,28,0.9) 0%, rgba(10,10,15,0.95) 100%);
+            border-left: 4px solid var(--red-neon);
+            padding: 2rem;
+        }
+
+        .project-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .gallery-card {
+            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border-cyber);
+            clip-path: var(--clip-chamfer);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100%;
+            min-height: 380px;
+            cursor: pointer;
+        }
+
+        .gallery-card:hover {
+            border-color: var(--red-neon);
+            box-shadow: 0 10px 30px rgba(255, 0, 60, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            min-height: 380px;
+            object-fit: cover;
+            flex: 1;
+            transition: transform 0.5s ease, filter 0.5s ease;
+            filter: grayscale(10%) contrast(1.1);
+        }
+
+        .gallery-card:hover .gallery-img {
+            transform: scale(1.08);
+            filter: grayscale(0%) contrast(1.2);
+        }
+
+        .gallery-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            border-top: 2px solid var(--red-neon);
+            padding: 15px 20px;
+            transform: translateY(calc(100% - 60px));
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gallery-card:hover .gallery-info {
+            transform: translateY(0);
+        }
+
+        .gallery-info h4 {
+            margin: 0;
+            height: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+        }
+
+        .gallery-info p {
+            margin: 10px 0 0 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.3s 0.1s ease;
+            line-height: 1.4;
+        }
+
+        .gallery-card:hover .gallery-info p {
+            opacity: 1;
+        }
+
+        /* MODALES GENERALES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(5, 5, 8, 0.95);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 80vh;
+            border: 2px solid var(--red-neon);
+            box-shadow: 0 0 30px var(--red-glow);
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            object-fit: contain;
+        }
+
+        #modal-caption {
+            margin-top: 15px;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--red-neon);
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: var(--red-neon);
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1100;
+        }
+
+        .modal-close:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--red-neon);
+        }
+
+        /* MODAL DE PROCESO (IMAGEN DOBLE + VIDEO) */
+        .process-modal-inner {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            background: var(--card-inner);
+            border: 2px solid var(--red-neon);
+            box-shadow: 0 0 30px var(--red-glow);
+            clip-path: var(--clip-chamfer);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .process-left {
+            flex: 1.5;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid var(--red-neon);
+        }
+
+        .process-right {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, rgba(20,20,28,0.95) 0%, rgba(10,10,15,0.98) 100%);
+        }
+
+        .process-main-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: opacity 0.3s ease;
+        }
+
+        .process-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(10, 10, 15, 0.7);
+            color: #fff;
+            border: 1px solid var(--red-neon);
+            cursor: pointer;
+            padding: 15px 10px;
+            font-size: 20px;
+            z-index: 10;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .process-arrow:hover {
+            background: var(--red-neon);
+            box-shadow: 0 0 15px var(--red-glow);
+        }
+
+        .process-prev { left: 10px; clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%); }
+        .process-next { right: 10px; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%); }
+
+        .process-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+            border-bottom: 1px solid var(--red-neon);
+            padding-bottom: 10px;
+        }
+
+        .process-desc {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .process-video-container {
+            flex-grow: 1;
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border-cyber);
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .process-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .badge-featured {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--red-neon);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            padding: 5px 15px;
+            letter-spacing: 2px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            z-index: 2;
+        }
+
+        .project-tag {
+            color: var(--red-bright);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .project-card h3 {
+            margin: 0 0 15px 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: #ffffff;
+        }
+
+        .mechanics-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            clip-path: var(--clip-chamfer-reverse);
+        }
+
+        .mechanics-box h4 {
+            color: #fff;
+            margin-top: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--red-neon);
+            padding-bottom: 5px;
+        }
+
+        .mechanics-box ul {
+            padding-left: 20px;
+            margin: 0;
+            color: #d0d0e0;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid var(--red-neon);
+            padding: 10px 25px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: auto;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            transition: all 0.3s;
+            width: fit-content;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--red-neon);
+            box-shadow: 0 0 20px var(--red-glow);
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .skill-badge {
+            background: rgba(20,20,28,0.8);
+            border: 1px solid var(--border-cyber);
+            color: #fff;
+            padding: 12px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .skill-badge::before {
+            content: '■';
+            color: var(--red-neon);
+            font-size: 0.7rem;
+        }
+
+        .skill-badge:hover {
+            border-color: var(--red-neon);
+            background: rgba(255,0,60,0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--red-glow);
+        }
+
+        .contact-panel {
+            background: rgba(10,10,15,0.8);
+            border: 1px solid var(--red-neon);
+            padding: 3rem;
+            clip-path: var(--clip-chamfer);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .contact-info p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-info p strong {
+            color: var(--red-bright);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            width: 100px;
+        }
+
+        .contact-info a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-info a:hover {
+            color: var(--red-neon);
+            text-shadow: 0 0 10px var(--red-glow);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #050508;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-cyber);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        .hide { display: none !important; }
+
+        @media (max-width: 1200px) {
+            .expandable-inner {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header-bio-text {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .project-card.featured {
+                grid-template-columns: 1fr;
+            }
+            .header-profile-img {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .expandable-inner {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding-top: 1rem;
+            }
+            .header-top-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .contact-panel {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .projects-layout {
+                grid-template-columns: 1fr;
+            }
+            .about-cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .process-modal-inner {
+                flex-direction: column;
+                height: 90vh;
+                overflow-y: auto;
+            }
+            .process-left {
+                flex: none;
+                height: 50%;
+                border-right: none;
+                border-bottom: 2px solid var(--red-neon);
+            }
+            .process-right {
+                flex: none;
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas Fondo Estrellas Neón -->
+    <canvas id="bg-canvas"></canvas>
+
+    <header id="main-header">
+        <div class="header-top-bar">
+            <a href="#" class="brand-nickname">T3CHNO_NYX <span>//</span></a>
+            <!-- Menú superior revertido (sin "Edición Audiovisual") -->
+            <nav>
+                <a href="javascript:void(0)" onclick="toggleAboutHeader()" id="btn-about">SOBRE MÍ</a>
+                <a href="#proyectos">PROYECTOS</a>
+                <a href="#habilidades">HABILIDADES</a>
+                <a href="#contacto">CONTACTO</a>
+            </nav>
+        </div>
+
+        <!-- Panel Desplegable Sobre Mí -->
+        <div class="expandable-content" id="expandable-panel">
+            <div class="expandable-inner">
+                <!-- Foto de Perfil con borde cyberpunk -->
+                <div class="header-profile-img">
+                    <div class="profile-img-wrapper">
+                        <img src="images/PICTURE.jpeg" alt="Carlos Osorno" class="profile-avatar">
+                    </div>
+                </div>
+
+                <!-- Título y Tarjetas Rápida (Estilo Datos) -->
+                <div class="header-bio-title">
+                    <h1>CARLOS<br>OSORNO</h1>
+                    <span class="subtitle">INGENIERÍA EN ANIMACIÓN Y VIDEOJUEGOS</span>
+                    
+                    <div class="about-cards-grid">
+                        <div class="about-card">
+                            <span class="about-card-title">DESARROLLO & TECH</span>
+                            <span class="about-card-desc">Unity (C#), Shader Graph, Lógica de Mecánicas.</span>
+                        </div>
+                        <div class="about-card">
+                            <span class="about-card-title" style="color: var(--red-bright);">ARTE & MODELADO 3D</span>
+                            <span class="about-card-desc">Maya, Blender, Substance Painter, Ilustración Digital.</span>
+                        </div>
+                        <div class="about-card" style="grid-column: 1 / -1;">
+                            <span class="about-card-title">PRODUCCIÓN DIGITAL</span>
+                            <span class="about-card-desc">UI/UX (Figma), Edición Audiovisual, Ps, Ai.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Texto de Biografía Uniforme -->
+                <div class="header-bio-text">
+                    <p>Soy estudiante de 5° semestre de <strong>Ingeniería en Animación y Videojuegos</strong> especializado en el ciclo completo de desarrollo de prototipos interactivos, integrando la lógica de programación con la creación artística digital.</p>
+                    <p>Cuento con sólida experiencia en prototipado en <strong>Unity (C#)</strong>, modelado 3D (<strong>Maya, Blender</strong>) e integración de shaders visuales. Domino el flujo de trabajo integral desde la conceptualización hasta la producción audiovisual y diseño UI/UX.</p>
+                    <p>Me destaco por mi capacidad de aprendizaje acelerado ante tecnologías emergentes, resolución técnica de problemas y colaboración efectiva en equipos multidisciplinarios.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resizer Interactivo -->
+        <div class="resizer-line" id="drag-resizer"></div>
+    </header>
+
+    <main>
+        <section id="proyectos">
+            <div class="cyber-header">
+                <h2>MIS PROYECTOS</h2>
+                <div class="hud-line"></div>
+            </div>
+            
+            <div class="filter-tabs">
+                <button class="tab-btn active" onclick="filterCategory('all', event)">TODOS</button>
+                <button class="tab-btn" onclick="filterCategory('videojuegos', event)">VIDEOJUEGOS</button>
+                <button class="tab-btn" onclick="filterCategory('ilustraciones', event)">ILUSTRACIONES</button>
+                <button class="tab-btn" onclick="filterCategory('modelado3d', event)">MODELADO 3D</button>
+                <!-- NUEVO BOTÓN DE FILTRO AQUÍ COMO LO PEDISTE -->
+                <button class="tab-btn" onclick="filterCategory('edicion', event)">EDICIÓN AUDIOVISUAL</button>
+            </div>
+
+            <div class="projects-layout">
+                <!-- Destacado 1 -->
+                <div class="project-card featured" data-category="videojuegos">
+                    <span class="badge-featured">DESTACADO</span>
+                    <div>
+                        <span class="project-tag">Unity / C# • Horror / Supervivencia 3D</span>
+                        <h3>Harmony Hunt (My Little Pony Horror)</h3>
+                        <p>Videojuego en primera persona desarrollado en Unity ambientado en un laberinto tétrico de suspenso. El jugador debe explorar el entorno para recolectar gemas indispensables para escapar. Si se encuentra la salida antes, la puerta permanecerá bloqueada.</p>
+                        
+                        <a href="https://github.com/T3CHN0G4M3R/MLP-MAZE.git" target="_blank" rel="noopener" class="btn" style="margin-top: 20px;">
+                            ACCEDER A GITHUB
+                        </a>
+                    </div>
+                    <div class="mechanics-box">
+                        <h4>Mecánicas e Interfaz Clave:</h4>
+                        <ul>
+                            <li><strong>Visión X-Ray:</strong> Habilidad para detectar gemas a través de las paredes.</li>
+                            <li><strong>Barra de Sprint:</strong> Sistema de resistencia para escapar velozmente.</li>
+                            <li><strong>Mecánica de Progreso:</strong> Bloqueo dinámico de salida que evalúa inventario.</li>
+                            <li><strong>Experiencia Inmersiva:</strong> Menú animado, lore, música ambiental y créditos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Destacado 2 -->
+                <div class="project-card featured" data-category="videojuegos">
+                    <span class="badge-featured">DESTACADO</span>
+                    <div>
+                        <span class="project-tag">Unity / C# • Competitivo / Carreras</span>
+                        <h3>Speed Runners (Recreación)</h3>
+                        <p>Recreación del juego Speed Runners en Unity, con mecánicas del juego originales y soporte para múltiples jugadores.</p>
+                        
+                        <a href="https://github.com/T3CHN0G4M3R/SpeedRunners.git" target="_blank" rel="noopener" class="btn" style="margin-top: 20px;">
+                            ACCEDER A GITHUB
+                        </a>
+                    </div>
+                    <div class="mechanics-box">
+                        <h4>Mecánicas e Interfaz Clave:</h4>
+                        <ul>
+                            <li><strong>Power-Ups:</strong> Habilidades específicas para entorpecer la carrera de tus oponentes.</li>
+                            <li><strong>Sprint:</strong> Sistema de velocidad para completar la carrera en el mejor tiempo posible.</li>
+                            <li><strong>Momentum:</strong> Mecánica central del juego. Impulso que afecta la velocidad y dirección del personaje.</li>
+                            <li><strong>Experiencia Competitiva:</strong> Multijugador local, con experiencia de juego acelerado y llena de adrenalina.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="ilustraciones" onclick="openProcessModal(['images/Emily.jpeg', 'images/Emily_Without_LineArt.jpeg'], 'images/Emily.mp4', 'Emily', 'Proceso de creación de Emily')">
+                    <span class="badge-featured" style="background:#fff; color:#000; right: 10px; top: 10px;"></span>
+                    <img src="images/Emily.jpeg" class="gallery-img" alt="Emily">
+                    <div class="gallery-info">
+                        <h4>Emily</h4>
+                        <p>Haz clic para ver 2 estilos distintos y el video del proceso de creación.</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="ilustraciones" onclick="openModal('images/Charlie_M.png', 'Charlie Morningstar')">
+                    <img src="images/Charlie_M.png" alt="Charlie Morningstar" class="gallery-img">
+                    <div class="gallery-info">
+                        <h4>Charlie Morningstar</h4>
+                        <p>Ilustración digital de Charlie Morningstar (Hazbin Hotel) realizada en Procreate.</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="ilustraciones" onclick="openModal('images/OC.jpeg', 'Original Character')">
+                    <img src="images/OC.jpeg" alt="Original Character" class="gallery-img">
+                    <div class="gallery-info">
+                        <h4>Original Character</h4>
+                        <p>Diseño y conceptualización de personaje original (OC), enfocado en vestuario y expresión.</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="ilustraciones" onclick="openModal('images/TIME.jpeg', 'Time - Inception Concept')">
+                    <img src="images/TIME.jpeg" alt="Time - Inception Concept" class="gallery-img">
+                    <div class="gallery-info">
+                        <h4>Time - Inception Concept</h4>
+                        <p>Arte conceptual e ilustración de atmósfera enfocada en iluminación y manejo de composición.</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="ilustraciones" onclick="openModal('images/POKEMON1.jpeg', 'Pokémon Fanart I')">
+                    <img src="images/POKEMON1.jpeg" alt="Pokémon Fanart I" class="gallery-img">
+                    <div class="gallery-info">
+                        <h4>Pokémon Fanart I</h4>
+                        <p>Ilustración estilo Fanart con paleta de color dinámica y sombreado digital.</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="ilustraciones" onclick="openModal('images/POKEMON2.jpeg', 'Pokémon Fanart II')">
+                    <img src="images/POKEMON2.jpeg" alt="Pokémon Fanart II" class="gallery-img">
+                    <div class="gallery-info">
+                        <h4>Pokémon Fanart II</h4>
+                        <p>Segunda pieza de la serie de ilustración y reinterpretación de criaturas Pokémon.</p>
+                    </div>
+                </div>
+
+                <div class="project-card" data-category="modelado3d">
+                    <img src="images/CineciaFiccion1.jpg" alt="Escenario 3D" class="project-img">
+                    <span class="project-tag">Maya / Substance</span>
+                    <h3>Escenarios & Assets 3D</h3>
+                    <p>Colección de modelos tridimensionales, texturizado PBR y props optimizados para tiempo real.</p>
+                </div>
+
+                <!-- VIDEO INCORPORADO EN LA GALERÍA, CON LA CATEGORÍA "edicion" -->
+                <div class="gallery-card" data-category="edicion" onclick="openVideoModal('images/VIDEOCLIP_ALASTOR.mp4', 'Videoclip - Recap Alastor')">
+                    <span class="badge-featured" style="right: 10px; top: 10px; display: flex; align-items: center; gap: 5px; font-weight: bold;">
+                        ▶ REPRODUCIR
+                    </span>
+                    <video src="images/VIDEOCLIP_ALASTOR.mp4" class="gallery-img" muted loop preload="metadata" onmouseover="this.play()" onmouseout="this.pause()" style="object-fit: cover; pointer-events: none;"></video>
+                    
+                    <div class="gallery-info">
+                        <h4>Videoclip - Recap Alastor</h4>
+                        <p>Montaje, efectos visuales y sincronización musical (Premiere Pro / After Effects). <strong>Haz clic para expandir.</strong></p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-category="edicion" onclick="openVideoModal('images/BLINKY.mp4', 'Videoclip - Blinky')">
+                    <span class="badge-featured" style="right: 10px; top: 10px; display: flex; align-items: center; gap: 5px; font-weight: bold;">
+                        ▶ REPRODUCIR
+                    </span>
+                    <video src="images/BLINKY.mp4" class="gallery-img" muted loop preload="metadata" onmouseover="this.play()" onmouseout="this.pause()" style="object-fit: cover; pointer-events: none;"></video>
+                    
+                    <div class="gallery-info">
+                        <h4>Videoclip - BLINKY</h4>
+                        <p>Montaje, efectos visuales y sincronización musical (Premiere Pro / After Effects). <strong>Haz clic para expandir.</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="habilidades">
+            <div class="cyber-header">
+                <h2>HABILIDADES TÉCNICAS</h2>
+                <div class="hud-line"></div>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-badge">Unity (C#)</div>
+                <div class="skill-badge">Autodesk Maya</div>
+                <div class="skill-badge">Blender</div>
+                <div class="skill-badge">Substance Painter</div>
+                <div class="skill-badge">C++</div>
+                <div class="skill-badge">Python</div>
+                <div class="skill-badge">SQL</div>
+                <div class="skill-badge">Figma (UI/UX)</div>
+                <div class="skill-badge">Adobe Photoshop</div>
+                <div class="skill-badge">Adobe Illustrator</div>
+                <div class="skill-badge">Adobe Premiere Pro</div>
+                <div class="skill-badge">Procreate</div>
+                <div class="skill-badge">Edición Audiovisual</div>
+            </div>
+        </section>
+
+        <section id="contacto">
+            <div class="contact-panel">
+                <div>
+                    <h2 style="font-family: 'Orbitron'; margin-top:0; color: #fff;">CONEXIÓN</h2>
+                    <p style="color: var(--text-muted); max-width: 500px;">¿Te interesa colaborar en un proyecto de videojuegos, animación o contratación profesional? Sistema abierto para mensajes.</p>
+                </div>
+                
+                <div class="contact-info">
+                    <p><strong>E-MAIL</strong> <a href="mailto:carlosabdiel109@gmail.com">carlosabdiel109@gmail.com</a></p>
+                    <p><strong>LINKEDIN</strong> <a href="https://www.linkedin.com/in/carlos-abdiel-osorno-gonz%C3%A1lez-974bb6336" target="_blank" rel="noopener">Carlos Abdiel Osorno</a></p>
+                    <p><strong>GITHUB</strong> <a href="https://github.com/T3CHN0G4M3R" target="_blank" rel="noopener">github.com/T3CHN0G4M3R</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Lightbox (Imágenes Simples) -->
+    <div id="image-modal" class="modal">
+        <span class="modal-close" onclick="closeModal('image-modal')">&times;</span>
+        <img class="modal-content" id="modal-img" alt="Vista Ampliada">
+        <div id="modal-caption"></div>
+    </div>
+
+    <!-- Modal de Proceso (Imagen Múltiple + Video) -->
+    <div id="process-modal" class="modal">
+        <span class="modal-close" onclick="closeModal('process-modal')">&times;</span>
+        <div class="process-modal-inner">
+            <div class="process-left">
+                <div class="process-arrow process-prev" onclick="changeProcessImage(-1)">&#10094;</div>
+                <img src="" id="process-main-img" class="process-main-img" alt="Dibujo">
+                <div class="process-arrow process-next" onclick="changeProcessImage(1)">&#10095;</div>
+            </div>
+            
+            <div class="process-right">
+                <h3 id="process-title" class="process-title">Título</h3>
+                <p id="process-desc" class="process-desc">Descripción</p>
+                
+                <div class="process-video-container">
+                    <video id="process-video" class="process-video" controls>
+                        Tu navegador no soporta videos HTML5.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dedicado para Reproducción de Video Grande -->
+    <div id="video-modal" class="modal">
+        <span class="modal-close" onclick="closeModal('video-modal')">&times;</span>
+        <div class="modal-content" style="background: #000; padding: 0; display: flex; flex-direction: column; width: 90%; max-width: 1100px;">
+            <video id="modal-video-player" controls style="width: 100%; max-height: 75vh; outline: none;"></video>
+            <div id="video-modal-caption" style="padding: 15px; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; text-align: center; background: rgba(10,10,15,0.95); letter-spacing: 2px; text-shadow: 0 0 10px var(--red-neon);"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 CARLOS OSORNO (T3CHNO_NYX) // TODOS LOS DERECHOS RESERVADOS</p>
+    </footer>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+        // 1. Canvas Fondo Animado (Partículas Neón)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.color = Math.random() > 0.3 ? `rgba(255, 0, 60, ${Math.random() * 0.6 + 0.2})` : `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 90; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 2. Control de Header Desplegable & Resizer
+        const header = document.getElementById('main-header');
+        const resizer = document.getElementById('drag-resizer');
+        const btnAbout = document.getElementById('btn-about');
+        let isDragging = false;
+        let currentHeaderHeight = 0;
+
+        function toggleAboutHeader() {
+            if (currentHeaderHeight > 0) {
+                setHeaderExtraHeight(0);
+                btnAbout.classList.remove('active');
+            } else {
+                setHeaderExtraHeight(420);
+                btnAbout.classList.add('active');
+            }
+        }
+
+        function setHeaderExtraHeight(px) {
+            currentHeaderHeight = Math.max(0, Math.min(px, 700));
+            document.documentElement.style.setProperty('--header-extra-height', `${currentHeaderHeight}px`);
+        }
+
+        resizer.addEventListener('mousedown', () => {
+            isDragging = true;
+            resizer.classList.add('dragging');
+            document.body.style.cursor = 'ns-resize';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const headerTop = header.getBoundingClientRect().top;
+            const newHeight = e.clientY - headerTop - 50;
+            setHeaderExtraHeight(newHeight);
+            if (currentHeaderHeight > 20) btnAbout.classList.add('active');
+            else btnAbout.classList.remove('active');
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                resizer.classList.remove('dragging');
+                document.body.style.cursor = 'default';
+            }
+        });
+
+        resizer.addEventListener('touchstart', () => {
+            isDragging = true;
+            resizer.classList.add('dragging');
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            const headerTop = header.getBoundingClientRect().top;
+            const newHeight = touch.clientY - headerTop - 50;
+            setHeaderExtraHeight(newHeight);
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+            resizer.classList.remove('dragging');
+        });
+
+        // 3. Filtrado por Categorías
+        function filterCategory(category, event) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (event) event.target.classList.add('active');
+
+            const items = document.querySelectorAll('[data-category]');
+            items.forEach(item => {
+                const itemCat = item.getAttribute('data-category');
+                if (category === 'all' || itemCat === category) {
+                    item.classList.remove('hide');
+                } else {
+                    item.classList.add('hide');
+                }
+            });
+        }
+
+        // 4. Modal Lightbox Clásico (Imágenes)
+        const imageModal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-img');
+        const modalCaption = document.getElementById('modal-caption');
+
+        function openModal(src, caption) {
+            imageModal.style.display = 'flex';
+            modalImg.src = src;
+            modalCaption.innerText = caption;
+        }
+
+        // 5. Modal de Proceso (Imágenes múltiples + Video)
+        const processModal = document.getElementById('process-modal');
+        let currentProcessImages = [];
+        let currentImageIndex = 0;
+
+        function openProcessModal(imagesArray, videoSrc, title, desc) {
+            currentProcessImages = imagesArray;
+            currentImageIndex = 0;
+            
+            document.getElementById('process-main-img').src = currentProcessImages[currentImageIndex];
+            document.getElementById('process-title').innerText = title;
+            document.getElementById('process-desc').innerText = desc;
+            
+            const videoElem = document.getElementById('process-video');
+            videoElem.src = videoSrc;
+            videoElem.load(); 
+
+            processModal.style.display = 'flex';
+        }
+
+        function changeProcessImage(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex < 0) {
+                currentImageIndex = currentProcessImages.length - 1;
+            } else if (currentImageIndex >= currentProcessImages.length) {
+                currentImageIndex = 0;
+            }
+            document.getElementById('process-main-img').src = currentProcessImages[currentImageIndex];
+        }
+
+        // 6. Función para abrir el Video individual gigante
+        const videoModal = document.getElementById('video-modal');
+        const modalVideoPlayer = document.getElementById('modal-video-player');
+        const videoModalCaption = document.getElementById('video-modal-caption');
+
+        function openVideoModal(src, caption) {
+            videoModal.style.display = 'flex';
+            modalVideoPlayer.src = src;
+            videoModalCaption.innerText = caption;
+            modalVideoPlayer.play();
+        }
+
+        // 7. Cierre general de Modales
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            
+            if(modalId === 'process-modal') {
+                const videoElem = document.getElementById('process-video');
+                videoElem.pause();
+            }
+            
+            // Si cerramos el modal de video individual, detenemos y reiniciamos el video
+            if(modalId === 'video-modal') {
+                const vidPlayer = document.getElementById('modal-video-player');
+                vidPlayer.pause();
+                vidPlayer.currentTime = 0;
+            }
+        }
+
+        // Cerrar al hacer clic fuera del contenido
+        window.addEventListener('click', (e) => {
+            if (e.target === imageModal) closeModal('image-modal');
+            if (e.target === processModal) closeModal('process-modal');
+            if (e.target === videoModal) closeModal('video-modal');
+        });
+    </script>
+</body>
+</html>
